@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Pedidos Firmados</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.8.0/zxing.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --blue-dark: #1d4ed8;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    min-height: 100dvh;
+    padding-bottom: 2rem;
+  }
+
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 14px 16px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--gray-900);
+    letter-spacing: -0.01em;
+  }
+  .topbar p {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 1px;
+  }
+
+  .section {
+    margin: 12px 12px 0;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* CONFIG */
+  .config-grid {
+    display: grid;
+    gap: 0;
+  }
+  .config-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 10px;
+  }
+  .config-row:last-child { border-bottom: none; }
+  .config-row label {
+    font-size: 13px;
+    color: var(--gray-700);
+    font-weight: 500;
+    min-width: 130px;
+    flex-shrink: 0;
+  }
+  .config-row input[type="date"],
+  .config-row select {
+    flex: 1;
+    border: 1px solid var(--gray-200);
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .config-row select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  /* SCANNER */
+  #video-wrap {
+    display: none;
+    position: relative;
+    width: 100%;
+  }
+  #video-wrap.active { display: block; }
+  #scanner-video {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+  .scan-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .scan-frame {
+    width: 210px;
+    height: 72px;
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 6px;
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
+  }
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: #3b82f6;
+    animation: scanline 1.8s ease-in-out infinite;
+    top: 50%;
+  }
+  @keyframes scanline {
+    0%,100% { transform: translateY(-34px); opacity: 0.7; }
+    50% { transform: translateY(34px); opacity: 1; }
+  }
+
+  .scan-controls {
+    padding: 12px 14px;
+  }
+
+  .btn-scan {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s;
+    background: var(--blue);
+    color: #fff;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-scan:active { transform: scale(0.97); }
+  .btn-scan.stop { background: var(--red); }
+
+  .manual-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .manual-row input {
+    flex: 1;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    outline: none;
+  }
+  .manual-row input:focus { border-color: var(--blue); background: #fff; }
+  .btn-add {
+    padding: 10px 16px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    background: var(--gray-50);
+    font-size: 20px;
+    color: var(--gray-700);
+    cursor: pointer;
+    font-weight: 300;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-add:active { background: var(--gray-200); }
+
+  .feedback {
+    margin-top: 8px;
+    min-height: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-align: center;
+    transition: opacity 0.2s;
+  }
+  .feedback:empty { visibility: hidden; }
+  .feedback.ok { background: var(--green-light); color: var(--green); }
+  .feedback.dup { background: var(--amber-light); color: var(--amber); }
+  .feedback.err { background: var(--red-light); color: var(--red); }
+
+  /* LIST */
+  .list-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .list-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+  .list-count span {
+    background: var(--blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 99px;
+    margin-right: 6px;
+  }
+  .btn-clear {
+    font-size: 12px;
+    color: var(--red);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 500;
+  }
+  .btn-clear:active { background: var(--red-light); }
+
+  .codes-list {
+    max-height: 260px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .empty-state {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 14px;
+  }
+  .empty-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+
+  .code-item {
+    display: flex;
+    align-items: center;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 10px;
+    animation: slideIn 0.12s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .code-item:last-child { border-bottom: none; }
+  .code-num {
+    font-size: 11px;
+    color: var(--gray-400);
+    min-width: 24px;
+    text-align: right;
+  }
+  .code-val {
+    flex: 1;
+    font-size: 14px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--gray-900);
+    letter-spacing: 0.02em;
+  }
+  .btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-300);
+    font-size: 18px;
+    padding: 4px 6px;
+    border-radius: 5px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-del:active { color: var(--red); background: var(--red-light); }
+
+  /* EXPORT */
+  .export-section {
+    margin: 12px 12px 0;
+  }
+  .btn-export {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(22,163,74,.25);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-export:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .btn-export:not(:disabled):active { transform: scale(0.97); }
+
+  .warning-banner {
+    margin: 10px 12px 0;
+    background: var(--amber-light);
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #92400e;
+    display: none;
+  }
+  .warning-banner.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>📦 Pedidos Firmados</h1>
+  <p>Escanea los códigos y genera el formato</p>
+</div>
+
+<!-- CONFIGURACIÓN -->
+<div class="section">
+  <div class="section-header">Configuración del formato</div>
+  <div class="config-grid">
+    <div class="config-row">
+      <label>Fábrica</label>
+      <select id="fabrica">
+        <option value="A">Fábrica A</option>
+        <option value="K">Fábrica K</option>
+        <option value="Q">Fábrica Q</option>
+      </select>
+    </div>
+    <div class="config-row">
+      <label>Entrega a cliente</label>
+      <input type="date" id="fecha-cliente">
+    </div>
+    <div class="config-row">
+      <label>Entrega a fábrica</label>
+      <input type="date" id="fecha-fabrica">
+    </div>
+  </div>
+</div>
+
+<!-- ESCÁNER -->
+<div class="section" style="margin-top:12px">
+  <div class="section-header">Escanear pedidos</div>
+  <div id="video-wrap">
+    <video id="scanner-video" autoplay playsinline muted></video>
+    <div class="scan-overlay">
+      <div class="scan-frame">
+        <div class="scan-line"></div>
+      </div>
+    </div>
+  </div>
+  <div class="scan-controls">
+    <button class="btn-scan" id="btn-scan" onclick="toggleScan()">
+      📷 Activar cámara
+    </button>
+    <div class="manual-row">
+      <input type="text" id="manual-input" placeholder="Código manual…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="btn-add" onclick="addManual()">+</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+</div>
+
+<!-- LISTA -->
+<div class="section" style="margin-top:12px">
+  <div class="list-header-row">
+    <div class="list-count"><span id="count-badge">0</span> <span id="count-text">pedidos</span></div>
+    <button class="btn-clear" onclick="clearAll()">Limpiar todo</button>
+  </div>
+  <div class="codes-list" id="codes-list">
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      Los códigos aparecerán aquí
+    </div>
+  </div>
+</div>
+
+<div class="warning-banner" id="warning-banner">
+  ⚠️ El formato soporta máximo 120 pedidos. Los pedidos del 121 en adelante no se incluirán.
+</div>
+
+<!-- EXPORTAR -->
+<div class="export-section">
+  <button class="btn-export" id="btn-export" onclick="exportExcel()" disabled>
+    ⬇️ Generar Excel
+  </button>
+</div>
+
+<script>
+// ── Estado ────────────────────────────────────────────────────────────────────
+let codes = [];
+let scanning = false;
+let stream = null;
+let codeReader = null;
+let lastCode = '';
+let lastCodeTime = 0;
+
+// ── Fecha default: hoy ────────────────────────────────────────────────────────
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('fecha-cliente').value = today;
+document.getElementById('fecha-fabrica').value = today;
+document.getElementById('manual-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addManual();
+});
+
+// ── Feedback ──────────────────────────────────────────────────────────────────
+let fbTimer = null;
+function showFeedback(msg, type) {
+  const el = document.getElementById('feedback');
+  el.textContent = msg;
+  el.className = 'feedback ' + type;
+  clearTimeout(fbTimer);
+  fbTimer = setTimeout(() => { el.textContent = ''; el.className = 'feedback'; }, 2500);
+}
+
+// ── Agregar código ────────────────────────────────────────────────────────────
+function addCode(code) {
+  code = code.trim().toUpperCase();
+  if (!code) return false;
+  if (codes.includes(code)) {
+    showFeedback('Ya registrado: ' + code, 'dup');
+    return false;
+  }
+  codes.push(code);
+  renderList();
+  showFeedback('✓ ' + code, 'ok');
+  return true;
+}
+
+function addManual() {
+  const inp = document.getElementById('manual-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  addCode(val);
+  inp.value = '';
+  inp.focus();
+}
+
+function removeCode(i) {
+  codes.splice(i, 1);
+  renderList();
+}
+
+function clearAll() {
+  if (!codes.length) return;
+  if (!confirm('¿Borrar todos los códigos?')) return;
+  codes = [];
+  renderList();
+}
+
+// ── Render lista ──────────────────────────────────────────────────────────────
+function renderList() {
+  const list = document.getElementById('codes-list');
+  const badge = document.getElementById('count-badge');
+  const text = document.getElementById('count-text');
+  const exportBtn = document.getElementById('btn-export');
+  const warning = document.getElementById('warning-banner');
+
+  badge.textContent = codes.length;
+  text.textContent = codes.length === 1 ? 'pedido' : 'pedidos';
+  exportBtn.disabled = codes.length === 0;
+  warning.className = 'warning-banner' + (codes.length > 120 ? ' show' : '');
+
+  if (!codes.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>Los códigos aparecerán aquí</div>';
+    return;
+  }
+
+  // Mostrar más reciente arriba
+  list.innerHTML = codes.slice().reverse().map((c, ri) => {
+    const i = codes.length - 1 - ri;
+    return `<div class="code-item">
+      <span class="code-num">${i + 1}</span>
+      <span class="code-val">${c}</span>
+      <button class="btn-del" onclick="removeCode(${i})" aria-label="Eliminar">×</button>
+    </div>`;
+  }).join('');
+}
+
+// ── Escáner ───────────────────────────────────────────────────────────────────
+async function toggleScan() {
+  scanning ? stopScan() : await startScan();
+}
+
+async function startScan() {
+  const btn = document.getElementById('btn-scan');
+  const wrap = document.getElementById('video-wrap');
+  const video = document.getElementById('scanner-video');
+
+  scanning = true;
+  wrap.classList.add('active');
+  btn.textContent = '⏹ Detener cámara';
+  btn.classList.add('stop');
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    video.srcObject = stream;
+
+    if (typeof ZXing !== 'undefined') {
+      const hints = new Map();
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+        ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+        ZXing.BarcodeFormat.EAN_13,  ZXing.BarcodeFormat.EAN_8,
+        ZXing.BarcodeFormat.UPC_A,   ZXing.BarcodeFormat.ITF,
+        ZXing.BarcodeFormat.QR_CODE, ZXing.BarcodeFormat.DATA_MATRIX
+      ]);
+      codeReader = new ZXing.BrowserMultiFormatReader(hints, 300);
+      codeReader.decodeFromVideoElement(video, (result, err) => {
+        if (!result || !scanning) return;
+        const now = Date.now();
+        const raw = result.getText().trim().toUpperCase();
+        if (raw !== lastCode || now - lastCodeTime > 2000) {
+          lastCode = raw;
+          lastCodeTime = now;
+          if (navigator.vibrate) navigator.vibrate(60);
+          addCode(raw);
+        }
+      });
+    } else if ('BarcodeDetector' in window) {
+      const detector = new BarcodeDetector({
+        formats: ['code_128','code_39','ean_13','ean_8','upc_a','itf','qr_code','data_matrix']
+      });
+      const tick = async () => {
+        if (!scanning) return;
+        try {
+          const found = await detector.detect(video);
+          if (found.length) {
+            const raw = found[0].rawValue.trim().toUpperCase();
+            const now = Date.now();
+            if (raw !== lastCode || now - lastCodeTime > 2000) {
+              lastCode = raw; lastCodeTime = now;
+              if (navigator.vibrate) navigator.vibrate(60);
+              addCode(raw);
+            }
+          }
+        } catch (_) {}
+        if (scanning) requestAnimationFrame(tick);
+      };
+      video.addEventListener('loadeddata', tick, { once: true });
+    } else {
+      showFeedback('Usa captura manual en este dispositivo', 'dup');
+    }
+  } catch (e) {
+    showFeedback('No se pudo acceder a la cámara', 'err');
+    stopScan();
+  }
+}
+
+function stopScan() {
+  scanning = false;
+  if (codeReader) { try { codeReader.reset(); } catch (_) {} codeReader = null; }
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  const video = document.getElementById('scanner-video');
+  video.srcObject = null;
+  document.getElementById('video-wrap').classList.remove('active');
+  const btn = document.getElementById('btn-scan');
+  btn.textContent = '📷 Activar cámara';
+  btn.classList.remove('stop');
+}
+
+// ── Exportar Excel ────────────────────────────────────────────────────────────
+function formatFecha(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  const meses = ['enero','febrero','marzo','abril','mayo','junio',
+                 'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${parseInt(d)}  de ${meses[parseInt(m)-1]}  ${y}`;
+}
+
+function exportExcel() {
+  if (!codes.length) return;
+
+  const fabrica  = document.getElementById('fabrica').value;
+  const fechaCli = document.getElementById('fecha-cliente').value;
+  const fechaFab = document.getElementById('fecha-fabrica').value;
+
+  // Construimos la hoja con la misma estructura que la plantilla
+  // Encabezado en E2 (col 5), FABRICA en D6, fechas en E8/E9
+  // Pedidos col B (rows 12-51), col D (rows 12-51), col F (rows 12-51)
+
+  const ws = {};
+
+  // Encabezado
+  ws['E2'] = { v: '                                     DEPARTAMENTO DE LOGÍSTICA Y EMBARQUES                                                                  FORMATO DE PEDIDOS FIRMADOS', t: 's' };
+
+  // Fábrica
+  ws['D6'] = { v: `FABRICA:${fabrica}`, t: 's' };
+
+  // Fechas
+  ws['A8'] = { v: 'Fecha de entrega a cliente:', t: 's' };
+  ws['E8'] = { v: formatFecha(fechaCli), t: 's' };
+  ws['A9'] = { v: 'Fecha de entrega a fábrica:', t: 's' };
+  ws['E9'] = { v: formatFecha(fechaFab), t: 's' };
+
+  // Headers de columnas
+  ws['A11'] = { v: 'No.', t: 's' };
+  ws['B11'] = { v: 'PEDIDO', t: 's' };
+  ws['C11'] = { v: 'No.', t: 's' };
+  ws['D11'] = { v: 'PEDIDO', t: 's' };
+  ws['E11'] = { v: 'No.', t: 's' };
+  ws['F11'] = { v: 'PEDIDO', t: 's' };
+
+  // Pedidos: máximo 120, en 3 columnas de 40
+  const pedidos = codes.slice(0, 120);
+
+  for (let i = 0; i < 40; i++) {
+    const row = 12 + i;
+    // Columna A: numeración 1-40
+    ws[`A${row}`] = { v: i + 1, t: 'n' };
+    // Columna B: pedidos 1-40
+    if (pedidos[i]) ws[`B${row}`] = { v: pedidos[i], t: 's' };
+    // Columna C: numeración 41-80
+    ws[`C${row}`] = { v: i + 41, t: 'n' };
+    // Columna D: pedidos 41-80
+    if (pedidos[i + 40]) ws[`D${row}`] = { v: pedidos[i + 40], t: 's' };
+    // Columna E: numeración 81-120
+    ws[`E${row}`] = { v: i + 81, t: 'n' };
+    // Columna F: pedidos 81-120
+    if (pedidos[i + 80]) ws[`F${row}`] = { v: pedidos[i + 80], t: 's' };
+  }
+
+  // Firma y observaciones
+  ws['H31'] = { v: 'FIRMA DE RECIBIDO', t: 's' };
+  ws['H44'] = { v: 'Observaciones adicionales', t: 's' };
+
+  // Rango de la hoja
+  ws['!ref'] = 'A1:K55';
+
+  // Anchos de columna aproximados
+  ws['!cols'] = [
+    { wch: 5 },  // A
+    { wch: 16 }, // B
+    { wch: 5 },  // C
+    { wch: 16 }, // D
+    { wch: 5 },  // E
+    { wch: 16 }, // F
+    { wch: 4 },  // G
+    { wch: 18 }, // H
+    { wch: 10 }, // I
+    { wch: 10 }, // J
+    { wch: 10 }, // K
+  ];
+
+  // Celdas fusionadas (igual que la plantilla original)
+  ws['!merges'] = [
+    { s: { r: 8, c: 0 }, e: { r: 8, c: 3 } },   // A9:D9
+    { s: { r: 1, c: 4 }, e: { r: 5, c: 10 } },  // E2:K6
+    { s: { r: 7, c: 0 }, e: { r: 7, c: 3 } },   // A8:D8
+    { s: { r: 43, c: 7 }, e: { r: 43, c: 10 } },// H44:K44
+    { s: { r: 7, c: 4 }, e: { r: 7, c: 10 } },  // E8:K8
+    { s: { r: 8, c: 4 }, e: { r: 8, c: 10 } },  // E9:K9
+    { s: { r: 30, c: 7 }, e: { r: 30, c: 9 } }, // H31:J31
+    { s: { r: 23, c: 7 }, e: { r: 29, c: 9 } }, // H24:J30
+    { s: { r: 44, c: 7 }, e: { r: 50, c: 10 } } // H45:K51
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+
+  const fecha = fechaCli || new Date().toISOString().split('T')[0];
+  const fname = `pedidos_fab${fabrica}_${fecha.replace(/-/g,'')}.xlsx`;
+  XLSX.writeFile(wb, fname);
+
+  showFeedback(`✓ ${pedidos.length} pedidos exportados`, 'ok');
+}
+</script>
+</body>
+</html>
