@@ -8,14 +8,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Pedidos Firmados</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.8.0/zxing.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --blue: #2563eb;
     --blue-light: #eff6ff;
-    --blue-dark: #1d4ed8;
     --green: #16a34a;
     --green-light: #f0fdf4;
     --red: #dc2626;
@@ -50,17 +48,8 @@
     top: 0;
     z-index: 10;
   }
-  .topbar h1 {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--gray-900);
-    letter-spacing: -0.01em;
-  }
-  .topbar p {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-top: 1px;
-  }
+  .topbar h1 { font-size: 17px; font-weight: 600; color: var(--gray-900); letter-spacing: -0.01em; }
+  .topbar p  { font-size: 12px; color: var(--gray-500); margin-top: 1px; }
 
   .section {
     margin: 12px 12px 0;
@@ -80,11 +69,6 @@
     letter-spacing: 0.06em;
   }
 
-  /* CONFIG */
-  .config-grid {
-    display: grid;
-    gap: 0;
-  }
   .config-row {
     display: flex;
     align-items: center;
@@ -114,22 +98,27 @@
     appearance: none;
     outline: none;
   }
-  .config-row select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
-
-  /* SCANNER */
-  #video-wrap {
-    display: none;
-    position: relative;
-    width: 100%;
+  .config-row select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
   }
+
+  /* Scanner */
+  #video-wrap { display: none; position: relative; width: 100%; background: #000; }
   #video-wrap.active { display: block; }
+
   #scanner-video {
     width: 100%;
-    height: 200px;
+    height: 220px;
     object-fit: cover;
     display: block;
-    background: #000;
   }
+
+  /* Canvas oculto para captura de frames */
+  #snap-canvas { display: none; }
+
   .scan-overlay {
     position: absolute;
     inset: 0;
@@ -139,28 +128,26 @@
     pointer-events: none;
   }
   .scan-frame {
-    width: 210px;
-    height: 72px;
-    border: 2px solid rgba(255,255,255,0.8);
+    width: 240px;
+    height: 80px;
+    border: 2px solid rgba(255,255,255,0.85);
     border-radius: 6px;
-    box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.35);
+    position: relative;
+    overflow: hidden;
   }
   .scan-line {
     position: absolute;
-    left: 0; right: 0;
-    height: 2px;
-    background: #3b82f6;
-    animation: scanline 1.8s ease-in-out infinite;
-    top: 50%;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    animation: scanline 1.6s ease-in-out infinite;
   }
   @keyframes scanline {
-    0%,100% { transform: translateY(-34px); opacity: 0.7; }
-    50% { transform: translateY(34px); opacity: 1; }
+    0%,100% { top: 4px; }
+    50%      { top: calc(100% - 6px); }
   }
 
-  .scan-controls {
-    padding: 12px 14px;
-  }
+  .scan-controls { padding: 12px 14px; }
 
   .btn-scan {
     width: 100%;
@@ -174,19 +161,15 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.15s;
+    transition: opacity 0.15s;
     background: var(--blue);
     color: #fff;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-scan:active { transform: scale(0.97); }
+  .btn-scan:active { opacity: 0.85; }
   .btn-scan.stop { background: var(--red); }
 
-  .manual-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-  }
+  .manual-row { display: flex; gap: 8px; margin-top: 10px; }
   .manual-row input {
     flex: 1;
     border: 1px solid var(--gray-200);
@@ -204,7 +187,7 @@
     border: 1px solid var(--gray-200);
     border-radius: 8px;
     background: var(--gray-50);
-    font-size: 20px;
+    font-size: 22px;
     color: var(--gray-700);
     cursor: pointer;
     font-weight: 300;
@@ -220,14 +203,13 @@
     padding: 6px 10px;
     border-radius: 6px;
     text-align: center;
-    transition: opacity 0.2s;
   }
   .feedback:empty { visibility: hidden; }
-  .feedback.ok { background: var(--green-light); color: var(--green); }
+  .feedback.ok  { background: var(--green-light); color: var(--green); }
   .feedback.dup { background: var(--amber-light); color: var(--amber); }
-  .feedback.err { background: var(--red-light); color: var(--red); }
+  .feedback.err { background: var(--red-light);   color: var(--red);   }
 
-  /* LIST */
+  /* Lista */
   .list-header-row {
     display: flex;
     align-items: center;
@@ -235,11 +217,7 @@
     padding: 12px 14px 10px;
     border-bottom: 1px solid var(--gray-100);
   }
-  .list-count {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-  }
+  .list-count { font-size: 13px; font-weight: 600; color: var(--gray-700); }
   .list-count span {
     background: var(--blue);
     color: #fff;
@@ -250,34 +228,16 @@
     margin-right: 6px;
   }
   .btn-clear {
-    font-size: 12px;
-    color: var(--red);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 5px;
-    font-weight: 500;
+    font-size: 12px; color: var(--red); background: none;
+    border: none; cursor: pointer; padding: 4px 8px;
+    border-radius: 5px; font-weight: 500;
   }
   .btn-clear:active { background: var(--red-light); }
 
-  .codes-list {
-    max-height: 260px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+  .codes-list { max-height: 260px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-  .empty-state {
-    padding: 28px 16px;
-    text-align: center;
-    color: var(--gray-400);
-    font-size: 14px;
-  }
-  .empty-icon {
-    font-size: 36px;
-    margin-bottom: 8px;
-    opacity: 0.5;
-  }
+  .empty-state { padding: 28px 16px; text-align: center; color: var(--gray-400); font-size: 14px; }
+  .empty-icon  { font-size: 36px; margin-bottom: 8px; opacity: 0.5; }
 
   .code-item {
     display: flex;
@@ -287,41 +247,19 @@
     gap: 10px;
     animation: slideIn 0.12s ease;
   }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-3px); }
-    to   { opacity: 1; transform: none; }
-  }
+  @keyframes slideIn { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:none; } }
   .code-item:last-child { border-bottom: none; }
-  .code-num {
-    font-size: 11px;
-    color: var(--gray-400);
-    min-width: 24px;
-    text-align: right;
-  }
-  .code-val {
-    flex: 1;
-    font-size: 14px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    color: var(--gray-900);
-    letter-spacing: 0.02em;
-  }
+  .code-num { font-size: 11px; color: var(--gray-400); min-width: 24px; text-align: right; }
+  .code-val  { flex: 1; font-size: 14px; font-family: 'SF Mono','Fira Code',monospace; color: var(--gray-900); }
   .btn-del {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--gray-300);
-    font-size: 18px;
-    padding: 4px 6px;
-    border-radius: 5px;
-    line-height: 1;
-    -webkit-tap-highlight-color: transparent;
+    background: none; border: none; cursor: pointer;
+    color: var(--gray-300); font-size: 20px; padding: 4px 6px;
+    border-radius: 5px; line-height: 1; -webkit-tap-highlight-color: transparent;
   }
   .btn-del:active { color: var(--red); background: var(--red-light); }
 
-  /* EXPORT */
-  .export-section {
-    margin: 12px 12px 0;
-  }
+  /* Export */
+  .export-section { margin: 12px 12px 0; }
   .btn-export {
     width: 100%;
     padding: 15px;
@@ -337,16 +275,11 @@
     justify-content: center;
     gap: 8px;
     box-shadow: 0 2px 8px rgba(22,163,74,.25);
-    transition: all 0.15s;
+    transition: opacity 0.15s;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-export:disabled {
-    background: var(--gray-300);
-    color: var(--gray-500);
-    box-shadow: none;
-    cursor: not-allowed;
-  }
-  .btn-export:not(:disabled):active { transform: scale(0.97); }
+  .btn-export:disabled { background: var(--gray-300); color: var(--gray-500); box-shadow: none; cursor: not-allowed; }
+  .btn-export:not(:disabled):active { opacity: 0.85; }
 
   .warning-banner {
     margin: 10px 12px 0;
@@ -368,44 +301,37 @@
   <p>Escanea los códigos y genera el formato</p>
 </div>
 
-<!-- CONFIGURACIÓN -->
 <div class="section">
   <div class="section-header">Configuración del formato</div>
-  <div class="config-grid">
-    <div class="config-row">
-      <label>Fábrica</label>
-      <select id="fabrica">
-        <option value="A">Fábrica A</option>
-        <option value="K">Fábrica K</option>
-        <option value="Q">Fábrica Q</option>
-      </select>
-    </div>
-    <div class="config-row">
-      <label>Entrega a cliente</label>
-      <input type="date" id="fecha-cliente">
-    </div>
-    <div class="config-row">
-      <label>Entrega a fábrica</label>
-      <input type="date" id="fecha-fabrica">
-    </div>
+  <div class="config-row">
+    <label>Fábrica</label>
+    <select id="fabrica">
+      <option value="A">Fábrica A</option>
+      <option value="K">Fábrica K</option>
+      <option value="Q">Fábrica Q</option>
+    </select>
+  </div>
+  <div class="config-row">
+    <label>Entrega a cliente</label>
+    <input type="date" id="fecha-cliente">
+  </div>
+  <div class="config-row">
+    <label>Entrega a fábrica</label>
+    <input type="date" id="fecha-fabrica">
   </div>
 </div>
 
-<!-- ESCÁNER -->
 <div class="section" style="margin-top:12px">
   <div class="section-header">Escanear pedidos</div>
   <div id="video-wrap">
-    <video id="scanner-video" autoplay playsinline muted></video>
+    <video id="scanner-video" autoplay playsinline muted webkit-playsinline></video>
+    <canvas id="snap-canvas"></canvas>
     <div class="scan-overlay">
-      <div class="scan-frame">
-        <div class="scan-line"></div>
-      </div>
+      <div class="scan-frame"><div class="scan-line"></div></div>
     </div>
   </div>
   <div class="scan-controls">
-    <button class="btn-scan" id="btn-scan" onclick="toggleScan()">
-      📷 Activar cámara
-    </button>
+    <button class="btn-scan" id="btn-scan" onclick="toggleScan()">📷 Activar cámara</button>
     <div class="manual-row">
       <input type="text" id="manual-input" placeholder="Código manual…" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="btn-add" onclick="addManual()">+</button>
@@ -414,7 +340,6 @@
   </div>
 </div>
 
-<!-- LISTA -->
 <div class="section" style="margin-top:12px">
   <div class="list-header-row">
     <div class="list-count"><span id="count-badge">0</span> <span id="count-text">pedidos</span></div>
@@ -429,26 +354,63 @@
 </div>
 
 <div class="warning-banner" id="warning-banner">
-  ⚠️ El formato soporta máximo 120 pedidos. Los pedidos del 121 en adelante no se incluirán.
+  ⚠️ Máximo 120 pedidos. Los del 121 en adelante no se incluirán.
 </div>
 
-<!-- EXPORTAR -->
 <div class="export-section">
-  <button class="btn-export" id="btn-export" onclick="exportExcel()" disabled>
-    ⬇️ Generar Excel
-  </button>
+  <button class="btn-export" id="btn-export" onclick="exportExcel()" disabled>⬇️ Generar Excel</button>
 </div>
 
 <script>
-// ── Estado ────────────────────────────────────────────────────────────────────
-let codes = [];
-let scanning = false;
-let stream = null;
-let codeReader = null;
-let lastCode = '';
-let lastCodeTime = 0;
+// ─── Estado ───────────────────────────────────────────────────────────────────
+let codes     = [];
+let scanning  = false;
+let stream    = null;
+let rafId     = null;
+let lastCode  = '';
+let lastTime  = 0;
+let fbTimer   = null;
 
-// ── Fecha default: hoy ────────────────────────────────────────────────────────
+// ZXing cargado como módulo ES desde jsDelivr (compatible con iOS Safari)
+let zxDecode = null;
+
+(async () => {
+  try {
+    // Usamos la build UMD de @zxing/library desde jsDelivr
+    await loadScript('https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js');
+    if (window.ZXing) {
+      const hints = new Map();
+      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+        ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+        ZXing.BarcodeFormat.EAN_13,   ZXing.BarcodeFormat.EAN_8,
+        ZXing.BarcodeFormat.UPC_A,    ZXing.BarcodeFormat.ITF,
+        ZXing.BarcodeFormat.QR_CODE,  ZXing.BarcodeFormat.DATA_MATRIX,
+      ]);
+      hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+      const reader = new ZXing.MultiFormatReader();
+      reader.setHints(hints);
+      zxDecode = (canvas) => {
+        const lum    = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+        const bin    = new ZXing.HybridBinarizer(lum);
+        const bitmap = new ZXing.BinaryBitmap(bin);
+        return reader.decode(bitmap).getText();
+      };
+      console.log('ZXing listo ✓');
+    }
+  } catch(e) {
+    console.warn('ZXing no cargó, se usará BarcodeDetector nativo:', e);
+  }
+})();
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+// ─── Fechas default ───────────────────────────────────────────────────────────
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fecha-cliente').value = today;
 document.getElementById('fecha-fabrica').value = today;
@@ -456,8 +418,7 @@ document.getElementById('manual-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') addManual();
 });
 
-// ── Feedback ──────────────────────────────────────────────────────────────────
-let fbTimer = null;
+// ─── Feedback ─────────────────────────────────────────────────────────────────
 function showFeedback(msg, type) {
   const el = document.getElementById('feedback');
   el.textContent = msg;
@@ -466,14 +427,11 @@ function showFeedback(msg, type) {
   fbTimer = setTimeout(() => { el.textContent = ''; el.className = 'feedback'; }, 2500);
 }
 
-// ── Agregar código ────────────────────────────────────────────────────────────
+// ─── Códigos ──────────────────────────────────────────────────────────────────
 function addCode(code) {
   code = code.trim().toUpperCase();
   if (!code) return false;
-  if (codes.includes(code)) {
-    showFeedback('Ya registrado: ' + code, 'dup');
-    return false;
-  }
+  if (codes.includes(code)) { showFeedback('Ya registrado: ' + code, 'dup'); return false; }
   codes.push(code);
   renderList();
   showFeedback('✓ ' + code, 'ok');
@@ -489,10 +447,7 @@ function addManual() {
   inp.focus();
 }
 
-function removeCode(i) {
-  codes.splice(i, 1);
-  renderList();
-}
+function removeCode(i) { codes.splice(i, 1); renderList(); }
 
 function clearAll() {
   if (!codes.length) return;
@@ -501,43 +456,38 @@ function clearAll() {
   renderList();
 }
 
-// ── Render lista ──────────────────────────────────────────────────────────────
 function renderList() {
-  const list = document.getElementById('codes-list');
-  const badge = document.getElementById('count-badge');
-  const text = document.getElementById('count-text');
-  const exportBtn = document.getElementById('btn-export');
+  const list    = document.getElementById('codes-list');
+  const badge   = document.getElementById('count-badge');
+  const text    = document.getElementById('count-text');
+  const expBtn  = document.getElementById('btn-export');
   const warning = document.getElementById('warning-banner');
 
   badge.textContent = codes.length;
-  text.textContent = codes.length === 1 ? 'pedido' : 'pedidos';
-  exportBtn.disabled = codes.length === 0;
+  text.textContent  = codes.length === 1 ? 'pedido' : 'pedidos';
+  expBtn.disabled   = codes.length === 0;
   warning.className = 'warning-banner' + (codes.length > 120 ? ' show' : '');
 
   if (!codes.length) {
     list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>Los códigos aparecerán aquí</div>';
     return;
   }
-
-  // Mostrar más reciente arriba
   list.innerHTML = codes.slice().reverse().map((c, ri) => {
     const i = codes.length - 1 - ri;
     return `<div class="code-item">
-      <span class="code-num">${i + 1}</span>
+      <span class="code-num">${i+1}</span>
       <span class="code-val">${c}</span>
-      <button class="btn-del" onclick="removeCode(${i})" aria-label="Eliminar">×</button>
+      <button class="btn-del" onclick="removeCode(${i})">×</button>
     </div>`;
   }).join('');
 }
 
-// ── Escáner ───────────────────────────────────────────────────────────────────
-async function toggleScan() {
-  scanning ? stopScan() : await startScan();
-}
+// ─── Escáner ──────────────────────────────────────────────────────────────────
+async function toggleScan() { scanning ? stopScan() : await startScan(); }
 
 async function startScan() {
-  const btn = document.getElementById('btn-scan');
-  const wrap = document.getElementById('video-wrap');
+  const btn   = document.getElementById('btn-scan');
+  const wrap  = document.getElementById('video-wrap');
   const video = document.getElementById('scanner-video');
 
   scanning = true;
@@ -547,63 +497,81 @@ async function startScan() {
 
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { min: 640, ideal: 1920, max: 1920 },
+        height: { min: 480, ideal: 1080, max: 1080 },
+      }
     });
     video.srcObject = stream;
+    await new Promise(r => { video.onloadedmetadata = r; });
+    video.play();
 
-    if (typeof ZXing !== 'undefined') {
-      const hints = new Map();
-      hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-        ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
-        ZXing.BarcodeFormat.EAN_13,  ZXing.BarcodeFormat.EAN_8,
-        ZXing.BarcodeFormat.UPC_A,   ZXing.BarcodeFormat.ITF,
-        ZXing.BarcodeFormat.QR_CODE, ZXing.BarcodeFormat.DATA_MATRIX
-      ]);
-      codeReader = new ZXing.BrowserMultiFormatReader(hints, 300);
-      codeReader.decodeFromVideoElement(video, (result, err) => {
-        if (!result || !scanning) return;
-        const now = Date.now();
-        const raw = result.getText().trim().toUpperCase();
-        if (raw !== lastCode || now - lastCodeTime > 2000) {
-          lastCode = raw;
-          lastCodeTime = now;
-          if (navigator.vibrate) navigator.vibrate(60);
-          addCode(raw);
-        }
-      });
-    } else if ('BarcodeDetector' in window) {
-      const detector = new BarcodeDetector({
+    const canvas = document.getElementById('snap-canvas');
+    const ctx    = canvas.getContext('2d', { willReadFrequently: true });
+
+    // BarcodeDetector nativa (disponible en Safari 17.4+ y Chrome)
+    let bdetector = null;
+    if ('BarcodeDetector' in window) {
+      bdetector = new BarcodeDetector({
         formats: ['code_128','code_39','ean_13','ean_8','upc_a','itf','qr_code','data_matrix']
       });
-      const tick = async () => {
-        if (!scanning) return;
-        try {
-          const found = await detector.detect(video);
-          if (found.length) {
-            const raw = found[0].rawValue.trim().toUpperCase();
-            const now = Date.now();
-            if (raw !== lastCode || now - lastCodeTime > 2000) {
-              lastCode = raw; lastCodeTime = now;
-              if (navigator.vibrate) navigator.vibrate(60);
-              addCode(raw);
+    }
+
+    let frameCount = 0;
+    const tick = async () => {
+      if (!scanning) return;
+
+      if (video.readyState >= 2 && video.videoWidth > 0) {
+        frameCount++;
+        // Procesar cada 3 frames para no saturar en móvil
+        if (frameCount % 3 === 0) {
+          canvas.width  = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0);
+
+          // 1) Intentar ZXing (mejor para Code 128)
+          if (zxDecode) {
+            try {
+              const txt = zxDecode(canvas);
+              if (txt) { onDetected(txt); rafId = requestAnimationFrame(tick); return; }
+            } catch(e) {
+              // NotFoundException es normal, ignorar
             }
           }
-        } catch (_) {}
-        if (scanning) requestAnimationFrame(tick);
-      };
-      video.addEventListener('loadeddata', tick, { once: true });
-    } else {
-      showFeedback('Usa captura manual en este dispositivo', 'dup');
-    }
-  } catch (e) {
+
+          // 2) Fallback BarcodeDetector nativa
+          if (bdetector) {
+            try {
+              const found = await bdetector.detect(canvas);
+              if (found.length) onDetected(found[0].rawValue);
+            } catch(_) {}
+          }
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    tick();
+
+  } catch(e) {
     showFeedback('No se pudo acceder a la cámara', 'err');
     stopScan();
   }
 }
 
+function onDetected(raw) {
+  if (!raw || !scanning) return;
+  raw = raw.trim().toUpperCase();
+  const now = Date.now();
+  if (raw === lastCode && now - lastTime < 2000) return;
+  lastCode = raw; lastTime = now;
+  if (navigator.vibrate) navigator.vibrate(60);
+  addCode(raw);
+}
+
 function stopScan() {
   scanning = false;
-  if (codeReader) { try { codeReader.reset(); } catch (_) {} codeReader = null; }
+  cancelAnimationFrame(rafId);
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
   const video = document.getElementById('scanner-video');
   video.srcObject = null;
@@ -613,7 +581,7 @@ function stopScan() {
   btn.classList.remove('stop');
 }
 
-// ── Exportar Excel ────────────────────────────────────────────────────────────
+// ─── Exportar ─────────────────────────────────────────────────────────────────
 function formatFecha(dateStr) {
   if (!dateStr) return '';
   const [y, m, d] = dateStr.split('-');
@@ -629,94 +597,57 @@ function exportExcel() {
   const fechaCli = document.getElementById('fecha-cliente').value;
   const fechaFab = document.getElementById('fecha-fabrica').value;
 
-  // Construimos la hoja con la misma estructura que la plantilla
-  // Encabezado en E2 (col 5), FABRICA en D6, fechas en E8/E9
-  // Pedidos col B (rows 12-51), col D (rows 12-51), col F (rows 12-51)
-
   const ws = {};
 
-  // Encabezado
-  ws['E2'] = { v: '                                     DEPARTAMENTO DE LOGÍSTICA Y EMBARQUES                                                                  FORMATO DE PEDIDOS FIRMADOS', t: 's' };
-
-  // Fábrica
-  ws['D6'] = { v: `FABRICA:${fabrica}`, t: 's' };
-
-  // Fechas
-  ws['A8'] = { v: 'Fecha de entrega a cliente:', t: 's' };
-  ws['E8'] = { v: formatFecha(fechaCli), t: 's' };
-  ws['A9'] = { v: 'Fecha de entrega a fábrica:', t: 's' };
-  ws['E9'] = { v: formatFecha(fechaFab), t: 's' };
-
-  // Headers de columnas
-  ws['A11'] = { v: 'No.', t: 's' };
+  ws['E2']  = { v: '                                     DEPARTAMENTO DE LOGÍSTICA Y EMBARQUES                                                                  FORMATO DE PEDIDOS FIRMADOS', t: 's' };
+  ws['D6']  = { v: `FABRICA:${fabrica}`, t: 's' };
+  ws['A8']  = { v: 'Fecha de entrega a cliente:', t: 's' };
+  ws['E8']  = { v: formatFecha(fechaCli), t: 's' };
+  ws['A9']  = { v: 'Fecha de entrega a fábrica:', t: 's' };
+  ws['E9']  = { v: formatFecha(fechaFab), t: 's' };
+  ws['A11'] = { v: 'No.',    t: 's' };
   ws['B11'] = { v: 'PEDIDO', t: 's' };
-  ws['C11'] = { v: 'No.', t: 's' };
+  ws['C11'] = { v: 'No.',    t: 's' };
   ws['D11'] = { v: 'PEDIDO', t: 's' };
-  ws['E11'] = { v: 'No.', t: 's' };
+  ws['E11'] = { v: 'No.',    t: 's' };
   ws['F11'] = { v: 'PEDIDO', t: 's' };
 
-  // Pedidos: máximo 120, en 3 columnas de 40
   const pedidos = codes.slice(0, 120);
-
   for (let i = 0; i < 40; i++) {
     const row = 12 + i;
-    // Columna A: numeración 1-40
-    ws[`A${row}`] = { v: i + 1, t: 'n' };
-    // Columna B: pedidos 1-40
-    if (pedidos[i]) ws[`B${row}`] = { v: pedidos[i], t: 's' };
-    // Columna C: numeración 41-80
-    ws[`C${row}`] = { v: i + 41, t: 'n' };
-    // Columna D: pedidos 41-80
-    if (pedidos[i + 40]) ws[`D${row}`] = { v: pedidos[i + 40], t: 's' };
-    // Columna E: numeración 81-120
-    ws[`E${row}`] = { v: i + 81, t: 'n' };
-    // Columna F: pedidos 81-120
-    if (pedidos[i + 80]) ws[`F${row}`] = { v: pedidos[i + 80], t: 's' };
+    ws[`A${row}`] = { v: i+1,    t: 'n' };
+    ws[`C${row}`] = { v: i+41,   t: 'n' };
+    ws[`E${row}`] = { v: i+81,   t: 'n' };
+    if (pedidos[i])      ws[`B${row}`] = { v: pedidos[i],      t: 's' };
+    if (pedidos[i+40])   ws[`D${row}`] = { v: pedidos[i+40],   t: 's' };
+    if (pedidos[i+80])   ws[`F${row}`] = { v: pedidos[i+80],   t: 's' };
   }
 
-  // Firma y observaciones
-  ws['H31'] = { v: 'FIRMA DE RECIBIDO', t: 's' };
+  ws['H31'] = { v: 'FIRMA DE RECIBIDO',         t: 's' };
   ws['H44'] = { v: 'Observaciones adicionales', t: 's' };
-
-  // Rango de la hoja
   ws['!ref'] = 'A1:K55';
-
-  // Anchos de columna aproximados
   ws['!cols'] = [
-    { wch: 5 },  // A
-    { wch: 16 }, // B
-    { wch: 5 },  // C
-    { wch: 16 }, // D
-    { wch: 5 },  // E
-    { wch: 16 }, // F
-    { wch: 4 },  // G
-    { wch: 18 }, // H
-    { wch: 10 }, // I
-    { wch: 10 }, // J
-    { wch: 10 }, // K
+    {wch:5},{wch:16},{wch:5},{wch:16},{wch:5},{wch:16},
+    {wch:4},{wch:18},{wch:10},{wch:10},{wch:10}
   ];
-
-  // Celdas fusionadas (igual que la plantilla original)
   ws['!merges'] = [
-    { s: { r: 8, c: 0 }, e: { r: 8, c: 3 } },   // A9:D9
-    { s: { r: 1, c: 4 }, e: { r: 5, c: 10 } },  // E2:K6
-    { s: { r: 7, c: 0 }, e: { r: 7, c: 3 } },   // A8:D8
-    { s: { r: 43, c: 7 }, e: { r: 43, c: 10 } },// H44:K44
-    { s: { r: 7, c: 4 }, e: { r: 7, c: 10 } },  // E8:K8
-    { s: { r: 8, c: 4 }, e: { r: 8, c: 10 } },  // E9:K9
-    { s: { r: 30, c: 7 }, e: { r: 30, c: 9 } }, // H31:J31
-    { s: { r: 23, c: 7 }, e: { r: 29, c: 9 } }, // H24:J30
-    { s: { r: 44, c: 7 }, e: { r: 50, c: 10 } } // H45:K51
+    { s:{r:8,c:0},  e:{r:8,c:3}   },
+    { s:{r:1,c:4},  e:{r:5,c:10}  },
+    { s:{r:7,c:0},  e:{r:7,c:3}   },
+    { s:{r:43,c:7}, e:{r:43,c:10} },
+    { s:{r:7,c:4},  e:{r:7,c:10}  },
+    { s:{r:8,c:4},  e:{r:8,c:10}  },
+    { s:{r:30,c:7}, e:{r:30,c:9}  },
+    { s:{r:23,c:7}, e:{r:29,c:9}  },
+    { s:{r:44,c:7}, e:{r:50,c:10} },
   ];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
 
   const fecha = fechaCli || new Date().toISOString().split('T')[0];
-  const fname = `pedidos_fab${fabrica}_${fecha.replace(/-/g,'')}.xlsx`;
-  XLSX.writeFile(wb, fname);
-
-  showFeedback(`✓ ${pedidos.length} pedidos exportados `, 'ok');
+  XLSX.writeFile(wb, `pedidos_fab${fabrica}_${fecha.replace(/-/g,'')}.xlsx`);
+  showFeedback(`✓ ${pedidos.length} pedidos exportados`, 'ok');
 }
 </script>
 </body>
