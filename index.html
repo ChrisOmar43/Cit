@@ -362,6 +362,8 @@
 </div>
 
 <script>
+const LOGO_B64 = "data:image/jpeg;base64,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";
+
 // ─── Estado ───────────────────────────────────────────────────────────────────
 let codes     = [];
 let scanning  = false;
@@ -597,14 +599,43 @@ function exportExcel() {
   const fechaCli = document.getElementById('fecha-cliente').value;
   const fechaFab = document.getElementById('fecha-fabrica').value;
 
+  const wb = XLSX.utils.book_new();
+
+  // ── Construir hoja manualmente con estilos ───────────────────────────────
+  // Usamos xl/worksheets/sheet1.xml vía SheetJS writeFile con bookType xlsx
+  // SheetJS CE no soporta estilos nativamente, así que construimos el xlsx
+  // directamente manipulando el zip con la estructura correcta
+
+  // --- Datos como AOA para posicionamiento ---
   const ws = {};
 
-  ws['E2']  = { v: '                                     DEPARTAMENTO DE LOGÍSTICA Y EMBARQUES                                                                  FORMATO DE PEDIDOS FIRMADOS', t: 's' };
-  ws['D6']  = { v: `FABRICA:${fabrica}`, t: 's' };
-  ws['A8']  = { v: 'Fecha de entrega a cliente:', t: 's' };
-  ws['E8']  = { v: formatFecha(fechaCli), t: 's' };
-  ws['A9']  = { v: 'Fecha de entrega a fábrica:', t: 's' };
-  ws['E9']  = { v: formatFecha(fechaFab), t: 's' };
+  // Helper para celda con estilo
+  const c = (v, t, s) => ({ v, t: t||'s', s });
+
+  // Estilos que usaremos (índices del styles.xml que vamos a inyectar)
+  // Los definimos como constantes para claridad
+  const S = {
+    header:     0,  // encabezado departamento: bold 14, wrap
+    fabrica:    1,  // FABRICA:X  bold 18
+    labelFecha: 2,  // "Fecha de entrega..." bold 16
+    fecha:      3,  // valor fecha 16, borde completo
+    noHeader:   4,  // No. fila 11: bold 18, borde, centro, fondo ROJO
+    pedHeader:  5,  // PEDIDO fila 11: bold 18, borde, centro, fondo ROJO
+    numCell:    6,  // números col A/C/E: 18, borde, centro
+    pedCell:    7,  // códigos col B/D/F: 16, borde, centro
+    firma:      8,  // FIRMA DE RECIBIDO: bold 14
+    obs:        9,  // Observaciones: bold 14
+  };
+
+  // ── Celdas de encabezado ──────────────────────────────────────────────────
+  ws['E2'] = { v: 'DEPARTAMENTO DE LOG\u00CDSTICA Y EMBARQUES\nFORMATO DE PEDIDOS FIRMADOS', t: 's' };
+  ws['D6'] = { v: `FABRICA:${fabrica}`, t: 's' };
+  ws['A8'] = { v: 'Fecha de entrega a cliente:', t: 's' };
+  ws['E8'] = { v: formatFecha(fechaCli), t: 's' };
+  ws['A9'] = { v: 'Fecha de entrega a fábrica:', t: 's' };
+  ws['E9'] = { v: formatFecha(fechaFab), t: 's' };
+
+  // ── Headers fila 11 ───────────────────────────────────────────────────────
   ws['A11'] = { v: 'No.',    t: 's' };
   ws['B11'] = { v: 'PEDIDO', t: 's' };
   ws['C11'] = { v: 'No.',    t: 's' };
@@ -612,42 +643,444 @@ function exportExcel() {
   ws['E11'] = { v: 'No.',    t: 's' };
   ws['F11'] = { v: 'PEDIDO', t: 's' };
 
+  // ── Pedidos ───────────────────────────────────────────────────────────────
   const pedidos = codes.slice(0, 120);
   for (let i = 0; i < 40; i++) {
     const row = 12 + i;
-    ws[`A${row}`] = { v: i+1,    t: 'n' };
-    ws[`C${row}`] = { v: i+41,   t: 'n' };
-    ws[`E${row}`] = { v: i+81,   t: 'n' };
-    if (pedidos[i])      ws[`B${row}`] = { v: pedidos[i],      t: 's' };
-    if (pedidos[i+40])   ws[`D${row}`] = { v: pedidos[i+40],   t: 's' };
-    if (pedidos[i+80])   ws[`F${row}`] = { v: pedidos[i+80],   t: 's' };
+    ws[`A${row}`] = { v: i+1,  t: 'n' };
+    ws[`C${row}`] = { v: i+41, t: 'n' };
+    ws[`E${row}`] = { v: i+81, t: 'n' };
+    if (pedidos[i])    ws[`B${row}`] = { v: pedidos[i],    t: 's' };
+    if (pedidos[i+40]) ws[`D${row}`] = { v: pedidos[i+40], t: 's' };
+    if (pedidos[i+80]) ws[`F${row}`] = { v: pedidos[i+80], t: 's' };
   }
 
   ws['H31'] = { v: 'FIRMA DE RECIBIDO',         t: 's' };
   ws['H44'] = { v: 'Observaciones adicionales', t: 's' };
+
   ws['!ref'] = 'A1:K55';
   ws['!cols'] = [
-    {wch:5},{wch:16},{wch:5},{wch:16},{wch:5},{wch:16},
-    {wch:4},{wch:18},{wch:10},{wch:10},{wch:10}
+    {wch: 5.14},  // A
+    {wch: 22.71}, // B
+    {wch: 6.86},  // C
+    {wch: 21.14}, // D
+    {wch: 7.14},  // E
+    {wch: 17.71}, // F
+    {wch: 4},     // G
+    {wch: 13.71}, // H
+    {wch: 10},    // I
+    {wch: 10},    // J
+    {wch: 10},    // K
   ];
+  ws['!rows'] = [];
+  ws['!rows'][1]  = { hpt: 15 };
+  ws['!rows'][5]  = { hpt: 23.25 };
+  ws['!rows'][7]  = { hpt: 21 };
+  ws['!rows'][8]  = { hpt: 21 };
+  ws['!rows'][10] = { hpt: 23.25 };
+  for (let i = 11; i <= 51; i++) ws['!rows'][i] = { hpt: 23.25 };
+
   ws['!merges'] = [
-    { s:{r:8,c:0},  e:{r:8,c:3}   },
-    { s:{r:1,c:4},  e:{r:5,c:10}  },
-    { s:{r:7,c:0},  e:{r:7,c:3}   },
-    { s:{r:43,c:7}, e:{r:43,c:10} },
-    { s:{r:7,c:4},  e:{r:7,c:10}  },
-    { s:{r:8,c:4},  e:{r:8,c:10}  },
-    { s:{r:30,c:7}, e:{r:30,c:9}  },
-    { s:{r:23,c:7}, e:{r:29,c:9}  },
-    { s:{r:44,c:7}, e:{r:50,c:10} },
+    { s:{r:1,c:4},  e:{r:5,c:10}  }, // E2:K6
+    { s:{r:7,c:0},  e:{r:7,c:3}   }, // A8:D8
+    { s:{r:7,c:4},  e:{r:7,c:10}  }, // E8:K8
+    { s:{r:8,c:0},  e:{r:8,c:3}   }, // A9:D9
+    { s:{r:8,c:4},  e:{r:8,c:10}  }, // E9:K9
+    { s:{r:30,c:7}, e:{r:30,c:9}  }, // H31:J31
+    { s:{r:23,c:7}, e:{r:29,c:9}  }, // H24:J30
+    { s:{r:43,c:7}, e:{r:43,c:10} }, // H44:K44
+    { s:{r:44,c:7}, e:{r:50,c:10} }, // H45:K51
   ];
 
-  const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
 
+  // ── Inyectar estilos y logo via manipulación del zip ─────────────────────
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+  // Cargar el zip generado y reemplazar styles.xml + añadir imagen
+  injectStylesAndLogo(wbout, fabrica, fechaCli, pedidos.length);
+}
+
+function injectStylesAndLogo(wbout, fabrica, fechaCli, numPedidos) {
+  // Usamos JSZip si está disponible, sino descargamos directamente
+  // Como no tenemos JSZip, inyectamos los estilos via un approach diferente:
+  // Reconstruimos el xlsx usando el XML directamente
+
+  // Generar el xlsx con estilos propios via Blob
+  const styledBlob = buildStyledXlsx(fabrica, fechaCli, numPedidos);
+  const url = URL.createObjectURL(styledBlob);
+  const a = document.createElement('a');
+  a.href = url;
   const fecha = fechaCli || new Date().toISOString().split('T')[0];
-  XLSX.writeFile(wb, `pedidos_fab${fabrica}_${fecha.replace(/-/g,'')}.xlsx`);
-  showFeedback(`✓ ${pedidos.length} pedidos exportados`, 'ok');
+  a.download = `pedidos_fab${fabrica}_${fecha.replace(/-/g,'')}.xlsx`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showFeedback(`✓ ${numPedidos} pedidos exportados`, 'ok');
+}
+
+function buildStyledXlsx(fabrica, fechaCli, numPedidosCount) {
+  const fechaFab = document.getElementById('fecha-fabrica').value;
+  const pedidos  = codes.slice(0, 120);
+
+  // ── styles.xml con fuentes, fills (rojo para headers), bordes ────────────
+  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="6">
+    <font><sz val="11"/><name val="Calibri"/></font>
+    <font><b/><sz val="14"/><name val="Calibri"/></font>
+    <font><sz val="16"/><name val="Calibri"/></font>
+    <font><b/><sz val="16"/><name val="Calibri"/></font>
+    <font><b/><sz val="18"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>
+    <font><sz val="18"/><name val="Calibri"/></font>
+  </fonts>
+  <fills count="3">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFCC0000"/><bgColor indexed="64"/></patternFill></fill>
+  </fills>
+  <borders count="4">
+    <border><left/><right/><top/><bottom/></border>
+    <border>
+      <left style="thin"><color indexed="64"/></left>
+      <right style="thin"><color indexed="64"/></right>
+      <top style="thin"><color indexed="64"/></top>
+      <bottom style="thin"><color indexed="64"/></bottom>
+    </border>
+    <border>
+      <left style="thin"><color indexed="64"/></left>
+      <right/><top/><bottom/>
+    </border>
+    <border>
+      <left/><right/>
+      <top style="thin"><color indexed="64"/></top>
+      <bottom style="thin"><color indexed="64"/></bottom>
+    </border>
+  </borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="10">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+    <xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center"/></xf>
+    <xf numFmtId="0" fontId="4" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="4" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="5" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
+  </cellXfs>
+</styleSheet>`;
+
+  // ── sharedStrings ─────────────────────────────────────────────────────────
+  const strings = [
+    `DEPARTAMENTO DE LOGÍSTICA Y EMBARQUES&#10;FORMATO DE PEDIDOS FIRMADOS`,
+    `FABRICA:${fabrica}`,
+    'Fecha de entrega a cliente:',
+    formatFecha(fechaCli),
+    'Fecha de entrega a fábrica:',
+    formatFecha(fechaFab),
+    'No.',
+    'PEDIDO',
+    'FIRMA DE RECIBIDO',
+    'Observaciones adicionales',
+  ];
+  // Añadir códigos de pedido
+  const pedIdx = {};
+  pedidos.forEach((p, i) => { pedIdx[p] = strings.length; strings.push(p); });
+
+  const ssXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${strings.length}" uniqueCount="${strings.length}">
+${strings.map(s => `<si><t xml:space="preserve">${escXml(s)}</t></si>`).join('')}
+</sst>`;
+
+  // Índices en sharedStrings
+  const SI = { dpto:0, fab:1, lblCli:2, fCli:3, lblFab:4, fFab:5, no:6, pedido:7, firma:8, obs:9 };
+
+  // ── sheet1.xml ────────────────────────────────────────────────────────────
+  // Estilos por celda: s="N" donde N es índice en cellXfs
+  // 0=default, 1=header dpto, 2=fabrica bold16, 3=fecha borde, 4=No header rojo, 5=PEDIDO header rojo, 6=num cell, 7=cod cell, 8=firma/obs, 9=label fecha left
+  const S = { def:0, dpto:1, fab:2, fechaVal:3, noHdr:4, pedHdr:5, numCell:6, codCell:7, firmobs:8, lblFecha:9 };
+
+  let rows = '';
+
+  // Fila 2: encabezado dpto (en E2, merged E2:K6)
+  rows += `<row r="2" ht="15"><c r="E2" s="${S.dpto}" t="s"><v>${SI.dpto}</v></c></row>`;
+  // Fila 6: fabrica
+  rows += `<row r="6" ht="23.25"><c r="D6" s="${S.fab}" t="s"><v>${SI.fab}</v></c></row>`;
+  // Fila 8: fecha cliente
+  rows += `<row r="8" ht="21"><c r="A8" s="${S.lblFecha}" t="s"><v>${SI.lblCli}</v></c><c r="E8" s="${S.fechaVal}" t="s"><v>${SI.fCli}</v></c></row>`;
+  // Fila 9: fecha fabrica
+  rows += `<row r="9" ht="21"><c r="A9" s="${S.lblFecha}" t="s"><v>${SI.lblFab}</v></c><c r="E9" s="${S.fechaVal}" t="s"><v>${SI.fFab}</v></c></row>`;
+  // Fila 11: headers con rojo
+  rows += `<row r="11" ht="23.25">` +
+    `<c r="A11" s="${S.noHdr}"  t="s"><v>${SI.no}</v></c>` +
+    `<c r="B11" s="${S.pedHdr}" t="s"><v>${SI.pedido}</v></c>` +
+    `<c r="C11" s="${S.noHdr}"  t="s"><v>${SI.no}</v></c>` +
+    `<c r="D11" s="${S.pedHdr}" t="s"><v>${SI.pedido}</v></c>` +
+    `<c r="E11" s="${S.noHdr}"  t="s"><v>${SI.no}</v></c>` +
+    `<c r="F11" s="${S.pedHdr}" t="s"><v>${SI.pedido}</v></c>` +
+    `</row>`;
+
+  // Filas 12-51: pedidos
+  for (let i = 0; i < 40; i++) {
+    const r = 12 + i;
+    const p1 = pedidos[i];
+    const p2 = pedidos[i+40];
+    const p3 = pedidos[i+80];
+    // Fila especial 31 (índice 19): firma de recibido
+    const firmaCell = (r === 31) ? `<c r="H31" s="${S.firmobs}" t="s"><v>${SI.firma}</v></c>` : '';
+    const obsCell   = (r === 44) ? `<c r="H44" s="${S.firmobs}" t="s"><v>${SI.obs}</v></c>` : '';
+    rows += `<row r="${r}" ht="23.25">` +
+      `<c r="A${r}" s="${S.numCell}"><v>${i+1}</v></c>` +
+      (p1 ? `<c r="B${r}" s="${S.codCell}" t="s"><v>${pedIdx[p1]}</v></c>` : `<c r="B${r}" s="${S.codCell}"/>`) +
+      `<c r="C${r}" s="${S.numCell}"><v>${i+41}</v></c>` +
+      (p2 ? `<c r="D${r}" s="${S.codCell}" t="s"><v>${pedIdx[p2]}</v></c>` : `<c r="D${r}" s="${S.codCell}"/>`) +
+      `<c r="E${r}" s="${S.numCell}"><v>${i+81}</v></c>` +
+      (p3 ? `<c r="F${r}" s="${S.codCell}" t="s"><v>${pedIdx[p3]}</v></c>` : `<c r="F${r}" s="${S.codCell}"/>`) +
+      firmaCell + obsCell +
+      `</row>`;
+  }
+
+  const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheetViews><sheetView workbookViewId="0"/></sheetViews>
+  <sheetFormatPr defaultRowHeight="23.25"/>
+  <cols>
+    <col min="1" max="1" width="5.14"  customWidth="1"/>
+    <col min="2" max="2" width="22.71" customWidth="1"/>
+    <col min="3" max="3" width="6.86"  customWidth="1"/>
+    <col min="4" max="4" width="21.14" customWidth="1"/>
+    <col min="5" max="5" width="7.14"  customWidth="1"/>
+    <col min="6" max="6" width="17.71" customWidth="1"/>
+    <col min="7" max="7" width="4"     customWidth="1"/>
+    <col min="8" max="8" width="13.71" customWidth="1"/>
+  </cols>
+  <sheetData>${rows}</sheetData>
+  <mergeCells count="9">
+    <mergeCell ref="E2:K6"/>
+    <mergeCell ref="A8:D8"/>
+    <mergeCell ref="E8:K8"/>
+    <mergeCell ref="A9:D9"/>
+    <mergeCell ref="E9:K9"/>
+    <mergeCell ref="H24:J30"/>
+    <mergeCell ref="H31:J31"/>
+    <mergeCell ref="H44:K44"/>
+    <mergeCell ref="H45:K51"/>
+  </mergeCells>
+  <drawing r:id="rId1"/>
+</worksheet>`;
+
+  // ── drawing2.xml: posición del logo (misma que original) ─────────────────
+  const drawingXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+          xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+  <xdr:twoCellAnchor editAs="oneCell">
+    <xdr:from><xdr:col>0</xdr:col><xdr:colOff>19052</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>114300</xdr:rowOff></xdr:from>
+    <xdr:to><xdr:col>1</xdr:col><xdr:colOff>1247776</xdr:colOff><xdr:row>5</xdr:row><xdr:rowOff>85725</xdr:rowOff></xdr:to>
+    <xdr:pic>
+      <xdr:nvPicPr>
+        <xdr:cNvPr id="2" name="Logo"/>
+        <xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr>
+      </xdr:nvPicPr>
+      <xdr:blipFill>
+        <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId1"/>
+        <a:stretch><a:fillRect/></a:stretch>
+      </xdr:blipFill>
+      <xdr:spPr>
+        <a:xfrm><a:off x="19052" y="114300"/><a:ext cx="1571624" cy="923925"/></a:xfrm>
+        <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+      </xdr:spPr>
+    </xdr:pic>
+    <xdr:clientData/>
+  </xdr:twoCellAnchor>
+</xdr:wsDr>`;
+
+  // ── workbook.xml ──────────────────────────────────────────────────────────
+  const wbXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Hoja1" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`;
+
+  const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+  const sheetRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>
+</Relationships>`;
+
+  const drawingRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.jpeg"/>
+</Relationships>`;
+
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml"  ContentType="application/xml"/>
+  <Default Extension="jpeg" ContentType="image/jpeg"/>
+  <Override PartName="/xl/workbook.xml"             ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml"    ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml"               ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/xl/sharedStrings.xml"        ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>
+  <Override PartName="/xl/drawings/drawing1.xml"    ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>
+</Types>`;
+
+  // ── Ensamblar ZIP ─────────────────────────────────────────────────────────
+  return zipFiles({
+    '[Content_Types].xml':                    contentTypes,
+    '_rels/.rels':                            rels,
+    'xl/workbook.xml':                        wbXml,
+    'xl/_rels/workbook.xml.rels':             wbRels,
+    'xl/worksheets/sheet1.xml':               sheetXml,
+    'xl/worksheets/_rels/sheet1.xml.rels':    sheetRels,
+    'xl/styles.xml':                          stylesXml,
+    'xl/sharedStrings.xml':                   ssXml,
+    'xl/drawings/drawing1.xml':               drawingXml,
+    'xl/drawings/_rels/drawing1.xml.rels':    drawingRels,
+    'xl/media/image1.jpeg':                   LOGO_B64,  // base64 string, se procesa abajo
+  });
+}
+
+function escXml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ── Mini ZIP builder (sin dependencias) ──────────────────────────────────────
+function zipFiles(files) {
+  // Implementación de ZIP local (Store, sin compresión) para máxima compatibilidad
+  const enc = new TextEncoder();
+  const entries = [];
+  let offset = 0;
+
+  for (const [name, content] of Object.entries(files)) {
+    const nameBytes = enc.encode(name);
+    let data;
+    if (name.endsWith('.jpeg') || name.endsWith('.jpg')) {
+      // content es un data URL base64
+      const b64 = content.split(',')[1];
+      const bin = atob(b64);
+      data = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) data[i] = bin.charCodeAt(i);
+    } else {
+      data = enc.encode(content);
+    }
+
+    const crc = crc32(data);
+    const header = makeLocalHeader(nameBytes, data.length, crc);
+    entries.push({ nameBytes, data, crc, header, offset });
+    offset += header.length + data.length;
+  }
+
+  // Central directory
+  const cdEntries = [];
+  for (const e of entries) {
+    cdEntries.push(makeCDEntry(e.nameBytes, e.data.length, e.crc, e.offset));
+  }
+
+  const cdSize   = cdEntries.reduce((s, b) => s + b.length, 0);
+  const eocd     = makeEOCD(entries.length, cdSize, offset);
+  const totalSize = offset + cdSize + eocd.length;
+
+  const buf = new Uint8Array(totalSize);
+  let pos = 0;
+  for (const e of entries) {
+    buf.set(e.header, pos); pos += e.header.length;
+    buf.set(e.data,   pos); pos += e.data.length;
+  }
+  for (const cd of cdEntries) { buf.set(cd, pos); pos += cd.length; }
+  buf.set(eocd, pos);
+
+  return new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+
+function w16(v) { return [v & 0xFF, (v >> 8) & 0xFF]; }
+function w32(v) { return [v & 0xFF, (v>>8)&0xFF, (v>>16)&0xFF, (v>>24)&0xFF]; }
+
+function makeLocalHeader(nameBytes, size, crc) {
+  const h = [
+    0x50,0x4B,0x03,0x04, // signature
+    0x14,0x00,           // version needed
+    0x00,0x00,           // flags
+    0x00,0x00,           // compression (Store)
+    0x00,0x00,           // mod time
+    0x00,0x00,           // mod date
+    ...w32(crc),
+    ...w32(size),        // compressed size
+    ...w32(size),        // uncompressed size
+    ...w16(nameBytes.length),
+    0x00,0x00,           // extra field length
+    ...nameBytes
+  ];
+  return new Uint8Array(h);
+}
+
+function makeCDEntry(nameBytes, size, crc, offset) {
+  const h = [
+    0x50,0x4B,0x01,0x02, // signature
+    0x14,0x00,           // version made by
+    0x14,0x00,           // version needed
+    0x00,0x00,           // flags
+    0x00,0x00,           // compression
+    0x00,0x00,           // mod time
+    0x00,0x00,           // mod date
+    ...w32(crc),
+    ...w32(size),
+    ...w32(size),
+    ...w16(nameBytes.length),
+    0x00,0x00,           // extra
+    0x00,0x00,           // comment
+    0x00,0x00,           // disk start
+    0x00,0x00,           // int attrs
+    0x00,0x00,0x00,0x00, // ext attrs
+    ...w32(offset),
+    ...nameBytes
+  ];
+  return new Uint8Array(h);
+}
+
+function makeEOCD(count, cdSize, cdOffset) {
+  const h = [
+    0x50,0x4B,0x05,0x06,
+    0x00,0x00,
+    0x00,0x00,
+    ...w16(count),
+    ...w16(count),
+    ...w32(cdSize),
+    ...w32(cdOffset),
+    0x00,0x00
+  ];
+  return new Uint8Array(h);
+}
+
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  const table = crc32.table || (crc32.table = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c;
+    }
+    return t;
+  })());
+  for (let i = 0; i < data.length; i++) crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
 }
 </script>
 </body>
